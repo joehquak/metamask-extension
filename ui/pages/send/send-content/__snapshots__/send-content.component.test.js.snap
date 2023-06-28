@@ -195,39 +195,7 @@ exports[`SendContent Component render should match snapshot 1`] = `
                     <div
                       class="box box--margin-right-1 box--flex-direction-row"
                     >
-                      Gas
-                    </div>
-                    <span
-                      class="gas-details-item-title__estimate"
-                    >
-                      (
-                      estimated
-                      )
-                    </span>
-                    <div
-                      class="info-tooltip"
-                      data-testid="info-tooltip"
-                    >
-                      <div>
-                        <div
-                          aria-describedby="tippy-tooltip-1"
-                          class="info-tooltip__tooltip-container"
-                          data-original-title="null"
-                          data-tooltipped=""
-                          style="display: inline;"
-                          tabindex="0"
-                        >
-                          <svg
-                            viewBox="0 0 10 10"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5 0C2.2 0 0 2.2 0 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 2c.4 0 .7.3.7.7s-.3.7-.7.7-.7-.2-.7-.6.3-.8.7-.8zm.7 6H4.3V4.3h1.5V8z"
-                              fill="var(--color-icon-alternative)"
-                            />
-                          </svg>
-                        </div>
-                      </div>
+                      Estimated fee
                     </div>
                   </div>
                 </h6>
@@ -266,11 +234,25 @@ exports[`SendContent Component render should match snapshot 1`] = `
                 class="transaction-detail-item__row"
               >
                 <div>
-                  <h6
-                    class="box box--margin-top-1 box--margin-bottom-1 box--flex-direction-row typography gas-timing gas-timing--negative typography--h7 typography--weight-normal typography--style-normal typography--color-text-default"
+                  <div
+                    class="box box--display-flex box--flex-direction-row"
                   >
-                    Unknown processing time
-                  </h6>
+                    <h6
+                      class="box box--margin-top-1 box--margin-bottom-1 box--flex-direction-row typography gas-timing__text typography--h7 typography--weight-normal typography--style-normal typography--color-text-default"
+                    >
+                      Unknown processing time
+                    </h6>
+                    <h6
+                      class="box box--margin-top-1 box--margin-bottom-1 box--flex-direction-row typography gas-timing gas-timing--negative typography--h7 typography--weight-normal typography--style-normal typography--color-text-default"
+                    >
+                      <span
+                        data-testid="gas-timing-time"
+                      >
+                        ~
+                        
+                      </span>
+                    </h6>
+                  </div>
                 </div>
                 <h6
                   class="box box--margin-top-1 box--margin-bottom-1 box--flex-direction-row typography transaction-detail-item__row-subText typography--h7 typography--weight-normal typography--style-normal typography--align-end typography--color-text-alternative"

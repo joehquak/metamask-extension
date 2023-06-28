@@ -7,7 +7,7 @@ exports[`CancelTransactionGasFee Component should render 1`] = `
   >
     <div
       class="currency-display-component cancel-transaction-gas-fee__eth"
-      title="0 ETH"
+      title="<0.000001 ETH"
     >
       <span
         class="currency-display-component__prefix"
@@ -15,7 +15,7 @@ exports[`CancelTransactionGasFee Component should render 1`] = `
       <span
         class="currency-display-component__text"
       >
-        0
+        &lt;0.000001
       </span>
       <span
         class="currency-display-component__suffix"
@@ -25,7 +25,7 @@ exports[`CancelTransactionGasFee Component should render 1`] = `
     </div>
     <div
       class="currency-display-component cancel-transaction-gas-fee__fiat"
-      title="0 ETH"
+      title="<0.000001 ETH"
     >
       <span
         class="currency-display-component__prefix"
@@ -33,7 +33,7 @@ exports[`CancelTransactionGasFee Component should render 1`] = `
       <span
         class="currency-display-component__text"
       >
-        0
+        &lt;0.000001
       </span>
       <span
         class="currency-display-component__suffix"

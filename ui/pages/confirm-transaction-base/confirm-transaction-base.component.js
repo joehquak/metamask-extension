@@ -55,6 +55,9 @@ import { ConfirmTitle } from '../../components/app/confirm-title';
 import { ConfirmSubTitle } from '../../components/app/confirm-subtitle';
 import { ConfirmGasDisplay } from '../../components/app/confirm-gas-display';
 import updateTxData from '../../../shared/modules/updateTxData';
+import { Color } from '../../helpers/constants/design-system';
+import { Icon, IconName, IconSize } from '../../components/component-library';
+import fetchEstimatedL1Fee from '../../helpers/utils/optimism/fetchEstimatedL1Fee';
 
 export default class ConfirmTransactionBase extends Component {
   static contextTypes = {
@@ -75,7 +78,7 @@ export default class ConfirmTransactionBase extends Component {
     fromName: PropTypes.string,
     hexTransactionAmount: PropTypes.string,
     hexMaximumTransactionFee: PropTypes.string,
-    hexTransactionTotal: PropTypes.string,
+    hexMinimumTransactionFee: PropTypes.string,
     methodData: PropTypes.object,
     nonce: PropTypes.string,
     useNonceField: PropTypes.bool,
@@ -148,6 +151,7 @@ export default class ConfirmTransactionBase extends Component {
   };
 
   state = {
+    expandFeeDetails: false,
     submitting: false,
     submitError: null,
     submitWarning: '',
@@ -155,6 +159,7 @@ export default class ConfirmTransactionBase extends Component {
     editingGas: false,
     userAcknowledgedGasMissing: false,
     showWarningModal: false,
+    estimatedL1Fees: null,
     ///: BEGIN:ONLY_INCLUDE_IN(build-mmi)
     noteText: '',
     ///: END:ONLY_INCLUDE_IN
@@ -301,6 +306,10 @@ export default class ConfirmTransactionBase extends Component {
     this.setState({ editingGas: false });
   }
 
+  setExpandFeeDetails(expandFeeDetails) {
+    this.setState({ expandFeeDetails });
+  }
+
   setUserAcknowledgedGasMissing() {
     this.setState({ userAcknowledgedGasMissing: true });
   }
@@ -310,7 +319,7 @@ export default class ConfirmTransactionBase extends Component {
       primaryTotalTextOverride,
       secondaryTotalTextOverride,
       hexMaximumTransactionFee,
-      hexTransactionTotal,
+      hexMinimumTransactionFee,
       useNonceField,
       customNonceValue,
       updateCustomNonce,
@@ -326,7 +335,8 @@ export default class ConfirmTransactionBase extends Component {
       useCurrencyRateCheck,
     } = this.props;
     const { t } = this.context;
-    const { userAcknowledgedGasMissing } = this.state;
+    const { userAcknowledgedGasMissing, expandFeeDetails, estimatedL1Fees } =
+      this.state;
 
     const { valid } = this.getErrorKey();
     const isDisabled = () => {
@@ -339,7 +349,14 @@ export default class ConfirmTransactionBase extends Component {
       hasSimulationError && !userAcknowledgedGasMissing;
     const networkName = NETWORK_TO_NAME_MAP[txData.chainId];
 
-    const renderTotalMaxAmount = () => {
+    const getTotalAmount = (useMaxFee) => {
+      return addHexes(
+        txData.txParams.value,
+        useMaxFee ? hexMaximumTransactionFee : hexMinimumTransactionFee,
+      );
+    };
+
+    const renderTotalMaxAmount = (useMaxFee) => {
       if (
         primaryTotalTextOverrideMaxAmount === undefined &&
         secondaryTotalTextOverride === undefined
@@ -349,7 +366,7 @@ export default class ConfirmTransactionBase extends Component {
           <UserPreferencedCurrencyDisplay
             type={PRIMARY}
             key="total-max-amount"
-            value={addHexes(txData.txParams.value, hexMaximumTransactionFee)}
+            value={getTotalAmount(useMaxFee)}
             hideLabel={!useNativeCurrencyAsPrimaryCurrency}
           />
         );
@@ -361,7 +378,7 @@ export default class ConfirmTransactionBase extends Component {
         : secondaryTotalTextOverride;
     };
 
-    const renderTotalDetailTotal = () => {
+    const renderTotalDetailTotal = (value) => {
       if (
         primaryTotalTextOverride === undefined &&
         secondaryTotalTextOverride === undefined
@@ -372,7 +389,7 @@ export default class ConfirmTransactionBase extends Component {
             <UserPreferencedCurrencyDisplay
               type={PRIMARY}
               key="total-detail-value"
-              value={hexTransactionTotal}
+              value={value}
               hideLabel={!useNativeCurrencyAsPrimaryCurrency}
             />
           </div>
@@ -383,7 +400,12 @@ export default class ConfirmTransactionBase extends Component {
         : secondaryTotalTextOverride;
     };
 
-    const renderTotalDetailText = () => {
+    const renderTotalDetailText = (value) => {
+      console.log(
+        'renderTotalDetailText: ',
+        primaryTotalTextOverride,
+        secondaryTotalTextOverride,
+      );
       if (
         primaryTotalTextOverride === undefined &&
         secondaryTotalTextOverride === undefined
@@ -394,7 +416,7 @@ export default class ConfirmTransactionBase extends Component {
             <UserPreferencedCurrencyDisplay
               type={SECONDARY}
               key="total-detail-text"
-              value={hexTransactionTotal}
+              value={value}
               hideLabel={Boolean(useNativeCurrencyAsPrimaryCurrency)}
             />
           </div>
@@ -449,6 +471,14 @@ export default class ConfirmTransactionBase extends Component {
       </div>
     );
 
+    const getTransactionFeeTotal = () => {
+      if (isMultiLayerFeeNetwork) {
+        return addHexes(hexMaximumTransactionFee, estimatedL1Fees || 0);
+      }
+
+      return hexMaximumTransactionFee;
+    };
+
     return (
       <div className="confirm-page-container-content__details">
         <TransactionAlerts
@@ -462,6 +492,7 @@ export default class ConfirmTransactionBase extends Component {
           isBuyableChain={isBuyableChain}
         />
         <TransactionDetail
+          disableEditGasFeeButton
           disabled={isDisabled()}
           userAcknowledgedGasMissing={userAcknowledgedGasMissing}
           onEdit={
@@ -470,31 +501,106 @@ export default class ConfirmTransactionBase extends Component {
           rows={[
             renderSimulationFailureWarning && simulationFailureWarning(),
             !renderSimulationFailureWarning && (
-              <ConfirmGasDisplay
-                key="confirm-transaction-base_confirm-gas-display"
-                userAcknowledgedGasMissing={userAcknowledgedGasMissing}
-              />
-            ),
-            !isMultiLayerFeeNetwork && (
-              <TransactionDetailItem
-                key="confirm-transaction-base-total-item"
-                detailTitle={t('total')}
-                detailText={useCurrencyRateCheck && renderTotalDetailText()}
-                detailTotal={renderTotalDetailTotal()}
-                subTitle={t('transactionDetailGasTotalSubtitle')}
-                subText={
-                  <div className="confirm-page-container-content__total-amount">
-                    <LoadingHeartBeat
-                      estimateUsed={this.props.txData?.userFeeLevel}
-                    />
-                    <strong key="editGasSubTextAmountLabel">
-                      {t('editGasSubTextAmountLabel')}
-                    </strong>{' '}
-                    {renderTotalMaxAmount()}
+              <div key="confirm-transaction-base_confirm-gas-display">
+                <ConfirmGasDisplay
+                  userAcknowledgedGasMissing={userAcknowledgedGasMissing}
+                />
+                {this.supportsEIP1559 && (
+                  <div className="confirm-page-container-content__accordion-header">
+                    <button
+                      onClick={() =>
+                        this.setExpandFeeDetails(!expandFeeDetails)
+                      }
+                      data-testid="expand-fee-details-button"
+                    >
+                      <span className="confirm-page-container-content__accordion-header__label">
+                        {t('feeDetails')}
+                      </span>
+                      <Icon
+                        name={
+                          expandFeeDetails
+                            ? IconName.ArrowUp
+                            : IconName.ArrowDown
+                        }
+                        color={Color.primaryDefault}
+                        size={IconSize.Md}
+                      />
+                    </button>
                   </div>
-                }
-              />
+                )}
+              </div>
             ),
+            this.supportsEIP1559 && expandFeeDetails && (
+              <div key="confirm-transaction-base-total-item">
+                <TransactionDetailItem
+                  detailTitle={t('metamaskFees')}
+                  detailText={
+                    useCurrencyRateCheck && renderTotalDetailText('0x0')
+                  }
+                  detailTotal={renderTotalDetailTotal('0x0')}
+                  boldHeadings={false}
+                />
+                {isMultiLayerFeeNetwork && (
+                  <TransactionDetailItem
+                    detailTitle={t('optimismFees')}
+                    detailText={
+                      useCurrencyRateCheck &&
+                      renderTotalDetailText(hexMaximumTransactionFee)
+                    }
+                    detailTotal={renderTotalDetailTotal(
+                      hexMaximumTransactionFee,
+                    )}
+                    boldHeadings={false}
+                  />
+                )}
+                {isMultiLayerFeeNetwork && estimatedL1Fees && (
+                  <TransactionDetailItem
+                    detailTitle={t('layer1Fees')}
+                    detailText={
+                      useCurrencyRateCheck &&
+                      renderTotalDetailText(estimatedL1Fees)
+                    }
+                    detailTotal={renderTotalDetailTotal(estimatedL1Fees)}
+                    boldHeadings={false}
+                  />
+                )}
+                <TransactionDetailItem
+                  detailTitle={t('total')}
+                  detailText={
+                    useCurrencyRateCheck &&
+                    renderTotalDetailText(getTransactionFeeTotal())
+                  }
+                  detailTotal={renderTotalDetailTotal(getTransactionFeeTotal())}
+                />
+              </div>
+            ),
+          ]}
+        />
+        <TransactionDetail
+          disableEditGasFeeButton
+          disabled={isDisabled()}
+          userAcknowledgedGasMissing={userAcknowledgedGasMissing}
+          rows={[
+            <TransactionDetailItem
+              key="confirm-transaction-base-total-item"
+              detailTitle={t('total')}
+              detailText={
+                useCurrencyRateCheck && renderTotalDetailText(getTotalAmount())
+              }
+              detailTotal={renderTotalMaxAmount(false)}
+              subTitle={t('transactionDetailGasTotalSubtitle')}
+              subText={
+                <div className="confirm-page-container-content__total-amount">
+                  <LoadingHeartBeat
+                    estimateUsed={this.props.txData?.userFeeLevel}
+                  />
+                  <strong key="editGasSubTextAmountLabel">
+                    {t('editGasSubTextAmountLabel')}
+                  </strong>{' '}
+                  {renderTotalMaxAmount(true)}
+                </div>
+              }
+            />,
           ]}
         />
         {nonceField}
@@ -880,6 +986,8 @@ export default class ConfirmTransactionBase extends Component {
         removePollingTokenFromAppState(this.state.pollingToken);
       }
     });
+
+    this.getEstimatedL1Fees();
     window.addEventListener('beforeunload', this._beforeUnloadForGasPolling);
   }
 
@@ -887,6 +995,18 @@ export default class ConfirmTransactionBase extends Component {
     this._beforeUnloadForGasPolling();
     this._removeBeforeUnload();
     this.props.clearConfirmTransaction();
+  }
+
+  async getEstimatedL1Fees() {
+    if (this.props.isMultiLayerFeeNetwork) {
+      const { txData } = this.props;
+      try {
+        const result = await fetchEstimatedL1Fee(txData?.chainId, txData);
+        this.setState({ estimatedL1Fees: result });
+      } catch (e) {
+        this.setState({ estimatedL1Fees: null });
+      }
+    }
   }
 
   supportsEIP1559 =

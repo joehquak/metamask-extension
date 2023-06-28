@@ -1,18 +1,26 @@
 .typography.gas-timing {
   color: var(--color-text-alternative);
 
+  &__text {
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    color: var(--color-text-alternative);
+  }
+
   &--positive {
+    margin-left: 5px;
     color: var(--color-success-default);
-    font-weight: bold;
   }
 
   &--warning {
+    margin-left: 5px;
     color: var(--color-warning-default);
   }
 
   &--negative {
-    color: var(--color-warning-default);
-    font-weight: bold;
+    margin-left: 5px;
+    color: var(--color-error-default);
   }
 
   .info-tooltip {

@@ -4,7 +4,7 @@ exports[`UserPreferencedCurrencyDisplay Component rendering should match snapsho
 <div>
   <div
     class="currency-display-component"
-    title="0 ETH"
+    title="<0.000001 ETH"
   >
     <span
       class="currency-display-component__prefix"
@@ -12,7 +12,7 @@ exports[`UserPreferencedCurrencyDisplay Component rendering should match snapsho
     <span
       class="currency-display-component__text"
     >
-      0
+      &lt;0.000001
     </span>
     <span
       class="currency-display-component__suffix"

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import BigNumber from 'bignumber.js';
+import Box from '../../ui/box';
 
 import { GasEstimateTypes } from '../../../../shared/constants/gas';
 
@@ -32,9 +33,9 @@ const SECOND_CUTOFF = 90;
 const toHumanReadableTime = (milliseconds = 1, t) => {
   const seconds = Math.ceil(milliseconds / 1000);
   if (seconds <= SECOND_CUTOFF) {
-    return t('gasTimingSeconds', [seconds]);
+    return t('gasTimingSecondsShort', [seconds]);
   }
-  return t('gasTimingMinutes', [Math.ceil(seconds / 60)]);
+  return t('gasTimingMinutesShort', [Math.ceil(seconds / 60)]);
 };
 export default function GasTiming({
   maxFeePerGas = 0,
@@ -115,8 +116,13 @@ export default function GasTiming({
 
   const { low = {}, medium = {}, high = {} } = gasFeeEstimates;
 
-  let text = '';
+  let text = t(estimateUsed || 'medium');
+  let time = '';
   let attitude = 'positive';
+
+  if (estimateUsed === 'low') {
+    text = t('gasTimingLow');
+  }
 
   // Anything medium or faster is positive
   if (
@@ -127,52 +133,52 @@ export default function GasTiming({
       Number(maxPriorityFeePerGas) < Number(high.suggestedMaxPriorityFeePerGas)
     ) {
       // Medium
-      text = t('gasTimingPositive', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      time = toHumanReadableTime(low.maxWaitTimeEstimate, t);
     } else {
       // High
-      text = t('gasTimingVeryPositive', [
-        toHumanReadableTime(high.minWaitTimeEstimate, t),
-      ]);
+      time = toHumanReadableTime(high.minWaitTimeEstimate, t);
     }
-  } else {
+  } else if (isUnknownLow) {
+    // If the user has chosen a value less than our low estimate,
+    // calculate a potential wait time
+
     if (estimateUsed === 'low') {
       attitude = 'negative';
     }
-    // If the user has chosen a value less than our low estimate,
-    // calculate a potential wait time
-    if (isUnknownLow) {
-      // If we didn't get any useful information, show the
-      // "unknown processing time" message
-      if (
-        !customEstimatedTime ||
-        customEstimatedTime === 'unknown' ||
-        customEstimatedTime?.upperTimeBound === 'unknown'
-      ) {
-        text = t('editGasTooLow');
-        attitude = 'negative';
-      } else {
-        text = t('gasTimingNegative', [
-          toHumanReadableTime(Number(customEstimatedTime?.upperTimeBound), t),
-        ]);
-      }
+    // If we didn't get any useful information, show the
+    // "unknown processing time" message
+    if (
+      !customEstimatedTime ||
+      customEstimatedTime === 'unknown' ||
+      customEstimatedTime?.upperTimeBound === 'unknown'
+    ) {
+      text = t('editGasTooLow');
+      attitude = 'negative';
     } else {
-      text = t('gasTimingNegative', [
-        toHumanReadableTime(low.maxWaitTimeEstimate, t),
-      ]);
+      time = toHumanReadableTime(
+        Number(customEstimatedTime?.upperTimeBound),
+        t,
+      );
     }
+  } else {
+    time = toHumanReadableTime(low.maxWaitTimeEstimate, t);
   }
 
   return (
-    <Typography
-      variant={TypographyVariant.H7}
-      className={classNames('gas-timing', {
-        [`gas-timing--${attitude}`]: attitude,
-      })}
-    >
-      {text}
-    </Typography>
+    <Box display="flex">
+      <Typography variant={TypographyVariant.H7} className="gas-timing__text">
+        {text}
+      </Typography>
+
+      <Typography
+        variant={TypographyVariant.H7}
+        className={classNames('gas-timing', {
+          [`gas-timing--${attitude}`]: attitude,
+        })}
+      >
+        <span data-testid="gas-timing-time">~{time}</span>
+      </Typography>
+    </Box>
   );
 }
 

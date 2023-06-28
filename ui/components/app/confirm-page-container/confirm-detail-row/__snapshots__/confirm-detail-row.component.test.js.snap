@@ -13,7 +13,7 @@ exports[`Confirm Detail Row Component should match snapshot 1`] = `
     >
       <div
         class="currency-display-component confirm-detail-row__primary"
-        title="0"
+        title="<0.000001"
       >
         <span
           class="currency-display-component__prefix"
@@ -26,12 +26,12 @@ exports[`Confirm Detail Row Component should match snapshot 1`] = `
         <span
           class="currency-display-component__text"
         >
-          0
+          &lt;0.000001
         </span>
       </div>
       <div
         class="currency-display-component confirm-detail-row__secondary"
-        title="0"
+        title="<0.000001"
       >
         <span
           class="currency-display-component__prefix"
@@ -44,7 +44,7 @@ exports[`Confirm Detail Row Component should match snapshot 1`] = `
         <span
           class="currency-display-component__text"
         >
-          0
+          &lt;0.000001
         </span>
       </div>
     </div>

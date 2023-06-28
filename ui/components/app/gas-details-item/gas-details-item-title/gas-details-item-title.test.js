@@ -44,8 +44,7 @@ describe('GasDetailsItem', () => {
   it('should render label', async () => {
     render();
     await waitFor(() => {
-      expect(screen.queryByText('Gas')).toBeInTheDocument();
-      expect(screen.queryByText('(estimated)')).toBeInTheDocument();
+      expect(screen.queryByText('Estimated fee')).toBeInTheDocument();
     });
   });
 });
