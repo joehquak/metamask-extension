@@ -176,8 +176,8 @@ exports[`ExperimentalTab with desktop enabled renders ExperimentalTab component 
             class="box box--margin-bottom-1 box--flex-direction-row typography typography--h6 typography--weight-normal typography--style-normal typography--color-text-alternative"
           >
             <span>
-               
-              This service is experimental. By enabling this feature, you agree to OpenSea's 
+
+              This service is experimental. By enabling this feature, you agree to OpenSea's
               <a
                 href="http://opensea.io/securityproviderterms"
                 rel="noopener noreferrer"
@@ -186,7 +186,7 @@ exports[`ExperimentalTab with desktop enabled renders ExperimentalTab component 
                 terms of use
               </a>
               .
-               
+
             </span>
           </h6>
           <h5
