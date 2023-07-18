@@ -2260,11 +2260,11 @@
   "metaMaskConnectStatusParagraphTwo": {
     "message": "The connection status button shows if the website you’re visiting is connected to your currently selected account."
   },
-  "metamaskInstitutionalVersion": {
-    "message": "MetaMask Institutional Version"
-  },
   "metamaskFees": {
     "message": "MetaMask fees"
+  },
+  "metamaskInstitutionalVersion": {
+    "message": "MetaMask Institutional Version"
   },
   "metamaskSwapsOfflineDescription": {
     "message": "MetaMask Swaps is undergoing maintenance. Please check back later."
