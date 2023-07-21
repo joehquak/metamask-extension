@@ -5,12 +5,12 @@ import { AvatarBase } from '../avatar-base';
 import Box from '../../ui/box/box';
 import {
   Size,
-  DISPLAY,
   AlignItems,
   JustifyContent,
   TextColor,
   BackgroundColor,
   BorderColor,
+  Display,
 } from '../../../helpers/constants/design-system';
 import { AVATAR_NETWORK_SIZES } from './avatar-network.constants';
 
@@ -45,7 +45,7 @@ export const AvatarNetwork = React.forwardRef(
       <AvatarBase
         ref={ref}
         size={size}
-        display={DISPLAY.FLEX}
+        display={Display.Flex}
         alignItems={AlignItems.center}
         justifyContent={JustifyContent.center}
         className={classnames(
