@@ -12,10 +12,19 @@ const trackEvent = jest.fn();
 const metricsState = { participateInMetaMetrics: null };
 const getMetricsState = () => metricsState;
 
+let flagAsDangerous = 0;
+
+const securityProviderRequest = () => {
+  return {
+    flagAsDangerous,
+  };
+};
+
 const handler = createRPCMethodTrackingMiddleware({
   trackEvent,
   getMetricsState,
   rateLimitSeconds: 1,
+  securityProviderRequest,
 });
 
 function getNext(timeout = 500) {
@@ -316,6 +325,10 @@ describe('createRPCMethodTrackingMiddleware', () => {
     });
 
     describe('when request is flagged as malicious by security provider', () => {
+      beforeEach(() => {
+        flagAsDangerous = 1;
+      });
+
       it(`should immediately track a ${MetaMetricsEventName.SignatureRequested} event which is flagged as malicious`, async () => {
         const req = {
           method: MESSAGE_TYPE.ETH_SIGN,
@@ -334,6 +347,7 @@ describe('createRPCMethodTrackingMiddleware', () => {
           event: MetaMetricsEventName.SignatureRequested,
           properties: {
             signature_type: MESSAGE_TYPE.ETH_SIGN,
+            ui_customizations: ['flagged_as_malicious'],
           },
           referrer: { url: 'some.dapp' },
         });
@@ -341,6 +355,10 @@ describe('createRPCMethodTrackingMiddleware', () => {
     });
 
     describe('when request flagged as safety unknown by security provider', () => {
+      beforeEach(() => {
+        flagAsDangerous = 2;
+      });
+
       it(`should immediately track a ${MetaMetricsEventName.SignatureRequested} event which is flagged as safety unknown`, async () => {
         const req = {
           method: MESSAGE_TYPE.ETH_SIGN,
@@ -359,6 +377,7 @@ describe('createRPCMethodTrackingMiddleware', () => {
           event: MetaMetricsEventName.SignatureRequested,
           properties: {
             signature_type: MESSAGE_TYPE.ETH_SIGN,
+            ui_customizations: ['flagged_as_safety_unknown'],
           },
           referrer: { url: 'some.dapp' },
         });
@@ -366,12 +385,19 @@ describe('createRPCMethodTrackingMiddleware', () => {
     });
 
     describe('when signature requests are received', () => {
-      let fnHandler;
+      let securityProviderReq, fnHandler;
       beforeEach(() => {
+        securityProviderReq = jest.fn().mockReturnValue(() =>
+          Promise.resolve({
+            flagAsDangerous: 0,
+          }),
+        );
+
         fnHandler = createRPCMethodTrackingMiddleware({
           trackEvent,
           getMetricsState,
           rateLimitSeconds: 1,
+          securityProviderRequest: securityProviderReq,
         });
       });
       it(`should pass correct data for personal sign`, async () => {
@@ -391,6 +417,10 @@ describe('createRPCMethodTrackingMiddleware', () => {
         const { next } = getNext();
 
         await fnHandler(req, res, next);
+
+        expect(securityProviderReq).toHaveBeenCalledTimes(1);
+        const call = securityProviderReq.mock.calls[0][0];
+        expect(call.msgParams.data).toStrictEqual(req.params[0]);
       });
       it(`should pass correct data for typed sign`, async () => {
         const req = {
@@ -408,6 +438,10 @@ describe('createRPCMethodTrackingMiddleware', () => {
         const { next } = getNext();
 
         await fnHandler(req, res, next);
+
+        expect(securityProviderReq).toHaveBeenCalledTimes(1);
+        const call = securityProviderReq.mock.calls[0][0];
+        expect(call.msgParams.data).toStrictEqual(req.params[1]);
       });
     });
   });

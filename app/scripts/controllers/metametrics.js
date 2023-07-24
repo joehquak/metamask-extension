@@ -766,7 +766,8 @@ export default class MetaMetricsController {
       [MetaMetricsUserTrait.MmiAccountAddress]: mmiAccountAddress,
       [MetaMetricsUserTrait.MmiIsCustodian]: Boolean(mmiAccountAddress),
       ///: END:ONLY_INCLUDE_IN
-      [MetaMetricsUserTrait.SecurityProviders]: [],
+      [MetaMetricsUserTrait.SecurityProviders]:
+        metamaskState.transactionSecurityCheckEnabled ? ['opensea'] : [],
     };
 
     if (!previousUserTraits) {

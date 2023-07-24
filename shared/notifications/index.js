@@ -114,14 +114,16 @@ export const UI_NOTIFICATIONS = {
       width: '100%',
     },
   },
+  ///: BEGIN:ONLY_INCLUDE_IN(blockaid)
   22: {
     id: 22,
     date: null,
     image: {
-      src: 'images/open-sea-security-provider.svg',
+      src: 'images/blockaid-security-provider.svg',
       width: '100%',
     },
   },
+  ///: END:ONLY_INCLUDE_IN
 };
 
 export const getTranslatedUINotifications = (t, locale) => {
@@ -321,6 +323,7 @@ export const getTranslatedUINotifications = (t, locale) => {
           )
         : '',
     },
+    ///: BEGIN:ONLY_INCLUDE_IN(blockaid)
     22: {
       ...UI_NOTIFICATIONS[22],
       title: t('notifications22Title'),
@@ -330,11 +333,12 @@ export const getTranslatedUINotifications = (t, locale) => {
         t('notifications22DescriptionThree'),
       ],
       actionText: t('notifications22ActionText'),
-      date: UI_NOTIFICATIONS[21].date
+      date: UI_NOTIFICATIONS[22].date
         ? new Intl.DateTimeFormat(formattedLocale).format(
-            new Date(UI_NOTIFICATIONS[21].date),
+            new Date(UI_NOTIFICATIONS[22].date),
           )
         : '',
     },
+    ///: END:ONLY_INCLUDE_IN
   };
 };

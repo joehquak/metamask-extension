@@ -1,8 +1,11 @@
 import { errorCodes } from 'eth-rpc-errors';
 import { detectSIWE } from '@metamask/controller-utils';
-import { isValidAddress } from 'ethereumjs-util/dist';
+import { isValidAddress } from 'ethereumjs-util';
+
 import { MESSAGE_TYPE, ORIGIN_METAMASK } from '../../../shared/constants/app';
+import { TransactionStatus } from '../../../shared/constants/transaction';
 import { SECOND } from '../../../shared/constants/time';
+
 import {
   MetaMetricsEventCategory,
   MetaMetricsEventName,
@@ -106,12 +109,15 @@ const rateLimitTimeouts = {};
  * @param {Function} opts.getMetricsState - get the state of
  *  MetaMetricsController
  * @param {number} [opts.rateLimitSeconds] - number of seconds to wait before
+ *  allowing another set of events to be tracked.
+ * @param opts.securityProviderRequest
  * @returns {Function}
  */
 export default function createRPCMethodTrackingMiddleware({
   trackEvent,
   getMetricsState,
   rateLimitSeconds = 60 * 5,
+  securityProviderRequest,
 }) {
   return async function rpcMethodTrackingMiddleware(
     /** @type {any} */ req,
@@ -167,13 +173,43 @@ export default function createRPCMethodTrackingMiddleware({
         // In personal messages the first param is data while in typed messages second param is data
         // if condition below is added to ensure that the right params are captured as data and address.
         let data;
+        let from;
         if (isValidAddress(req?.params?.[1])) {
           data = req?.params?.[0];
+          from = req?.params?.[1];
         } else {
           data = req?.params?.[1];
+          from = req?.params?.[0];
         }
+        const paramsExamplePassword = req?.params?.[2];
+
+        const msgData = {
+          msgParams: {
+            ...paramsExamplePassword,
+            from,
+            data,
+            origin,
+          },
+          status: TransactionStatus.unapproved,
+          type: req.method,
+        };
 
         try {
+          const securityProviderResponse = await securityProviderRequest(
+            msgData,
+            req.method,
+          );
+
+          if (securityProviderResponse?.flagAsDangerous === 1) {
+            eventProperties.ui_customizations = [
+              MetaMetricsEventUiCustomization.FlaggedAsMalicious,
+            ];
+          } else if (securityProviderResponse?.flagAsDangerous === 2) {
+            eventProperties.ui_customizations = [
+              MetaMetricsEventUiCustomization.FlaggedAsSafetyUnknown,
+            ];
+          }
+
           if (method === MESSAGE_TYPE.PERSONAL_SIGN) {
             const { isSIWEMessage } = detectSIWE({ data });
             if (isSIWEMessage) {
