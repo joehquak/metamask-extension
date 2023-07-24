@@ -1956,6 +1956,9 @@
   "missingSettingRequest": {
     "message": "Υποβάλετε αίτημα εδώ"
   },
+  "moreComingSoon": {
+    "message": "Περισσότερα έρχονται σύντομα..."
+  },
   "mustSelectOne": {
     "message": "Πρέπει να επιλέξετε 1 τουλάχιστον διακριτικό."
   },
@@ -2506,6 +2509,9 @@
   },
   "openInBlockExplorer": {
     "message": "Προβολή στον εξερευνητή μπλοκ"
+  },
+  "openSea": {
+    "message": "OpenSea (Beta)"
   },
   "openSeaNew": {
     "message": "OpenSea"
@@ -3075,6 +3081,9 @@
   },
   "selectPathHelp": {
     "message": "Εάν δεν βλέπετε τους αναμενόμενους λογαριασμούς, προσπαθήστε να αλλάξετε το μονοπάτι HD."
+  },
+  "selectProvider": {
+    "message": "Επιλέξτε παρόχους:"
   },
   "selectType": {
     "message": "Επιλέξτε Τύπο"

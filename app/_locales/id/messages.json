@@ -1956,6 +1956,9 @@
   "missingSettingRequest": {
     "message": "Minta di sini"
   },
+  "moreComingSoon": {
+    "message": "Selanjutnya akan segera hadir..."
+  },
   "mustSelectOne": {
     "message": "Harus memilih minimal 1 token."
   },
@@ -2506,6 +2509,9 @@
   },
   "openInBlockExplorer": {
     "message": "Buka di block explorer"
+  },
+  "openSea": {
+    "message": "OpenSea (Beta)"
   },
   "openSeaNew": {
     "message": "OpenSea"
@@ -3078,6 +3084,9 @@
   },
   "selectPathHelp": {
     "message": "Jika Anda tidak menemukan akun yang diharapkan, coba alihkan jalur HD."
+  },
+  "selectProvider": {
+    "message": "Pilih penyedia:"
   },
   "selectType": {
     "message": "Pilih Jenis"
