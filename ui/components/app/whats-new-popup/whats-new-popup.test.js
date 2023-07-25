@@ -97,7 +97,7 @@ const render = () => {
           date: '2022-07-24',
           id: 22,
           isShown: false,
-        }
+        },
         ///: END:ONLY_INCLUDE_IN(blockaid)
       },
     },
@@ -128,9 +128,15 @@ describe('WhatsNewPopup', () => {
   ///: BEGIN:ONLY_INCLUDE_IN(blockaid)
   it('renders WhatsNewPopup component and shows blockaid messages', () => {
     render();
-    expect(screen.getByTestId('whats-new-description-item-0')).toBeInTheDocument();
-    expect(screen.getByTestId('whats-new-description-item-1')).toBeInTheDocument();
-    expect(screen.getByTestId('whats-new-description-item-2')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('whats-new-description-item-0'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('whats-new-description-item-1'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('whats-new-description-item-2'),
+    ).toBeInTheDocument();
   });
   ///: END:ONLY_INCLUDE_IN
 });
