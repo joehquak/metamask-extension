@@ -119,7 +119,7 @@ export const UI_NOTIFICATIONS = {
     id: 22,
     date: null,
     image: {
-      src: 'images/blockaid-security-provider.svg',
+      src: 'images/blockaid-security-provider.png',
       width: '100%',
     },
   },
