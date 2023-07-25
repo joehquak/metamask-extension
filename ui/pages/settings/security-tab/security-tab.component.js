@@ -11,6 +11,7 @@ import {
   MetaMetricsEventKeyType,
   MetaMetricsEventName,
 } from '../../../../shared/constants/metametrics';
+import { IPFS_DEFAULT_GATEWAY_URL } from '../../../../shared/constants/network';
 import {
   AUTO_DETECT_TOKEN_LEARN_MORE_LINK,
   COINGECKO_LINK,
@@ -61,6 +62,7 @@ export default class SecurityTab extends PureComponent {
     ipfsGateway: this.props.ipfsGateway,
     ipfsGatewayError: '',
     srpQuizModalVisible: false,
+    ipfsToggle: false,
   };
 
   settingsRefCounter = 0;
@@ -311,7 +313,7 @@ export default class SecurityTab extends PureComponent {
     const { ipfsGatewayError } = this.state;
 
     const handleIpfsGatewaySave = (gateway) => {
-      const url = new URL(addUrlProtocolPrefix(gateway));
+      const url = gateway ? new URL(addUrlProtocolPrefix(gateway)) : '';
       const { host } = url;
 
       this.props.setIpfsGateway(host);
@@ -346,6 +348,11 @@ export default class SecurityTab extends PureComponent {
       });
     };
 
+    const handleIpfsToggle = (url) => {
+      url === null || url.length < 1
+        ? handleIpfsGatewayChange(IPFS_DEFAULT_GATEWAY_URL)
+        : handleIpfsGatewayChange('');
+    };
     return (
       <div
         ref={this.settingsRefs[5]}
@@ -358,13 +365,23 @@ export default class SecurityTab extends PureComponent {
             {t('addCustomIPFSGatewayDescription')}
           </div>
         </div>
+        <ToggleButton
+          value={this.state.ipfsGateway}
+          onToggle={(value) => {
+            handleIpfsToggle(value);
+            this.setState({ ipfsToggle: Boolean(value) });
+          }}
+          offLabel={t('off')}
+          onLabel={t('on')}
+        />
         <div className="settings-page__content-item">
           <div className="settings-page__content-item-col">
             <TextField
               type="text"
+              disabled={!this.state.ipfsGateway}
               value={this.state.ipfsGateway}
               onChange={(e) => handleIpfsGatewayChange(e.target.value)}
-              error={ipfsGatewayError}
+              error={!this.state.ipfsToggle && ipfsGatewayError}
               fullWidth
               margin="dense"
             />
