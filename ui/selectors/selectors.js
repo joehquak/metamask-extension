@@ -1009,7 +1009,7 @@ function getAllowedAnnouncementIds(state) {
     20: currentKeyringIsLedger && isFirefox,
     21: isSwapsChain,
     ///: BEGIN:ONLY_INCLUDE_IN(blockaid)
-    22: true
+    22: true,
     ///: END:ONLY_INCLUDE_IN
   };
 }
