@@ -122,6 +122,7 @@ const renderDescription = (description) => {
         const isLast = index === description.length - 1;
         return (
           <Text
+            data-testid={`whats-new-description-item-${index}`}
             key={`item-${index}`}
             variant={TextVariant.bodyMd}
             marginBottom={isLast ? 0 : 4}
