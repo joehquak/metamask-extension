@@ -62,6 +62,8 @@ import {
 ///: END:ONLY_INCLUDE_IN
 ///: BEGIN:ONLY_INCLUDE_IN(keyring-snaps)
 import { SnapKeyring } from '@metamask/eth-snap-keyring';
+// eslint-disable-next-line import/order
+import AccountsController from './controllers/accounts-controller';
 ///: END:ONLY_INCLUDE_IN
 
 ///: BEGIN:ONLY_INCLUDE_IN(build-mmi)
@@ -1007,6 +1009,19 @@ export default class MetamaskController extends EventEmitter {
       },
     });
 
+    const accountsControllerMessenger = this.controllerMessenger.getRestricted({
+      name: 'AccountsController',
+      allowedEvents: ['SnapController:stateChange'],
+    });
+
+    this.accountsController = new AccountsController({
+      messenger: accountsControllerMessenger,
+      state: initState.accountsController,
+      onPreferencesStateChange: (listener) => {
+        this.preferencesController.store.subscribe(listener);
+      },
+    });
+
     this.notificationController = new NotificationController({
       messenger: this.controllerMessenger.getRestricted({
         name: 'NotificationController',
@@ -1662,6 +1677,9 @@ export default class MetamaskController extends EventEmitter {
     this.memStore = new ComposableObservableStore({
       config: {
         AppStateController: this.appStateController.store,
+        ///: BEGIN:ONLY_INCLUDE_IN(keyring-snaps)
+        AccountsController: this.accountsController,
+        ///: END:ONLY_INCLUDE_IN
         NetworkController: this.networkController,
         CachedBalancesController: this.cachedBalancesController.store,
         KeyringController: this.keyringController.memStore,
@@ -2951,6 +2969,10 @@ export default class MetamaskController extends EventEmitter {
         this.preferencesController.getLedgerTransportPreference();
       this.setLedgerTransportPreference(transportPreference);
 
+      ///: BEGIN:ONLY_INCLUDE_IN(keyring-snaps)
+      await this.accountsController.updateAccounts();
+      ///: END:ONLY_INCLUDE_IN
+
       // set new identities
       this.preferencesController.setAddresses(accounts);
       this.selectFirstIdentity();
@@ -3015,6 +3037,10 @@ export default class MetamaskController extends EventEmitter {
       this.preferencesController.getLedgerTransportPreference();
 
     this.setLedgerTransportPreference(transportPreference);
+
+    ///: BEGIN:ONLY_INCLUDE_IN(keyring-snaps)
+    await this.accountsController.updateAccounts();
+    ///: END:ONLY_INCLUDE_IN
 
     return this.keyringController.fullUpdate();
   }
