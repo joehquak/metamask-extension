@@ -2714,19 +2714,19 @@
     "message": "Introducing new and refreshed Swaps!"
   },
   "notifications22ActionText": {
-    "message": "Enable security provider"
+    "message": "Enable security alerts"
   },
   "notifications22DescriptionOne": {
-    "message": "Get warnings from Blockaid whenever you recieve a known malicious request"
+    "message": "Steer clear of known scams while still preserving your privacy with security alerts powered by Blockaid."
   },
   "notifications22DescriptionThree": {
-    "message": "Always be sure to do your own due diligence before approving any request"
+    "message": "If you enabled security alerts from OpenSea, we've moved you over to this feature."
   },
   "notifications22DescriptionTwo": {
-    "message": "Blockaid is the first security provider for this feature. More providers coming soon"
+    "message": "Always do your own due diligence before approving requests."
   },
   "notifications22Title": {
-    "message": "Stay safe with Blockaid"
+    "message": "Stay safe with security alerts"
   },
   "notifications3ActionText": {
     "message": "Read more",
