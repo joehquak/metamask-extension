@@ -862,15 +862,19 @@ export default class MetamaskController extends EventEmitter {
       ),
     });
 
+    keyringControllerMessenger.subscribe('KeyringController:unlock', () =>
+      this._onUnlock(),
+    );
+    keyringControllerMessenger.subscribe('KeyringController:lock', () =>
+      this._onLock(),
+    );
+
     this.keyringController =
       this.coreKeyringController.getEthKeyringController();
 
     this.keyringController.memStore.subscribe((state) =>
       this._onKeyringControllerUpdate(state),
     );
-
-    this.keyringController.on('unlock', () => this._onUnlock());
-    this.keyringController.on('lock', () => this._onLock());
 
     const getIdentities = () =>
       this.preferencesController.store.getState().identities;
@@ -2992,10 +2996,9 @@ export default class MetamaskController extends EventEmitter {
    * is up to date with known accounts once the vault is decrypted.
    *
    * @param {string} password - The user's password
-   * @returns {Promise<object>} The keyringController update.
    */
   async submitPassword(password) {
-    await this.keyringController.submitPassword(password);
+    await this.coreKeyringController.submitPassword(password);
 
     ///: BEGIN:ONLY_INCLUDE_IN(build-mmi)
     this.mmiController.onSubmitPassword();
@@ -3015,8 +3018,6 @@ export default class MetamaskController extends EventEmitter {
       this.preferencesController.getLedgerTransportPreference();
 
     this.setLedgerTransportPreference(transportPreference);
-
-    return this.keyringController.fullUpdate();
   }
 
   async _loginUser() {
@@ -4647,7 +4648,7 @@ export default class MetamaskController extends EventEmitter {
       this.clearLoginArtifacts();
     }
 
-    return this.keyringController.setLocked();
+    return this.coreKeyringController.setLocked();
   }
 
   removePermissionsFor = (subjects) => {

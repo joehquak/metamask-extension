@@ -320,7 +320,7 @@ describe('MetaMaskController', function () {
           metamaskController.preferencesController.store.getState().identities,
         );
         const addresses =
-          await metamaskController.keyringController.getAccounts();
+          await metamaskController.coreKeyringController.getAccounts();
 
         identities.forEach((identity) => {
           assert.ok(
